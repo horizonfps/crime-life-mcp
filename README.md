@@ -1,91 +1,91 @@
 # Crime.Life MCP Bot
 
-Bot para o jogo [Crime.Life](https://crime.life) que roda como servidor MCP (Model Context Protocol). O **Claude Code e o cerebro** — ele joga, toma decisoes, salva aprendizados e evolui a estrategia ao longo do tempo.
+A bot for the [Crime.Life](https://crime.life) browser RPG that runs as an MCP server (Model Context Protocol). **Claude Code is the brain** — it plays the game, makes decisions, saves learnings, and evolves its strategy over time.
 
-## Como funciona
+## How it works
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│  Claude Code CLI (O CEREBRO)                         │
-│  - Le o game state via get_game_state                │
-│  - Decide e executa acoes (commit_crime, train, etc) │
-│  - Salva aprendizados (save_memory)                  │
-│  - Evolui a estrategia (get_strategy/update_strategy)│
+│  Claude Code CLI (THE BRAIN)                         │
+│  - Reads game state via get_game_state               │
+│  - Decides and executes actions (commit_crime, etc)  │
+│  - Saves learnings (save_memory)                     │
+│  - Evolves strategy (get_strategy / update_strategy) │
 └──────────────────┬───────────────────────────────────┘
                    │ stdio (MCP)
 ┌──────────────────▼───────────────────────────────────┐
 │  server.mjs  (MCP Server - 35+ tools)                │
 ├──────────┬──────────┬───────────┬────────────────────┤
 │ game-api │ captcha  │ brain.mjs │ memory.mjs         │
-│ HTTP API │ Nopecha  │ Strategy  │ Persistencia       │
-│ REST     │ hCaptcha │ + Shop DB │ em /db/*.md        │
+│ HTTP API │ Nopecha  │ Strategy  │ Persistent storage │
+│ REST     │ hCaptcha │ + Shop DB │ in /db/*.md        │
 └──────────┴──────────┴───────────┴────────────────────┘
 ```
 
-**Sem LLM externa.** O Claude Code usa as MCP tools diretamente pra jogar. A estrategia vive em `db/strategies/master-strategy.md` — o Claude Code le, segue, e evolui conforme aprende.
+**No external LLM required.** Claude Code uses the MCP tools directly to play. The strategy lives in `db/strategies/master-strategy.md` — Claude Code reads it, follows it, and evolves it as it learns.
 
-**Auto-geração:** Na primeira vez que o bot roda, ele escaneia o jogo (player stats, crimes disponiveis, quests, clima, equipamentos) e gera uma estrategia completa do zero. Nao precisa configurar nada.
+**Auto-generation:** On first run, the bot scans the game (player stats, available crimes, quests, weather, equipment) and generates a complete strategy from scratch. No manual configuration needed.
 
-### Fluxo de jogo
+### Game loop
 
-1. Voce fala "joga" pro Claude Code
-2. Ele chama `get_game_state` pra ver o estado atual
-3. Se nao existir estrategia, escaneia o jogo e gera uma automaticamente
-4. Le a estrategia com `get_strategy`
-5. Decide a melhor acao e executa (commit_crime, train, buy_drug, etc)
-6. Salva aprendizados em `db/` via `save_memory`
-7. Quando espera energia, revisa e atualiza a estrategia
-8. Repete
+1. You tell Claude Code "play the game"
+2. It calls `get_game_state` to see the current state
+3. If no strategy exists, it scans the game and auto-generates one
+4. Reads the strategy with `get_strategy`
+5. Decides the best action and executes it (commit_crime, train, buy_drug, etc)
+6. Saves learnings to `db/` via `save_memory`
+7. During energy downtime, reviews and updates the strategy
+8. Repeats
 
-### Arquivos
+### Files
 
-| Arquivo | O que faz |
+| File | Purpose |
 |---|---|
-| `src/server.mjs` | Servidor MCP com 35+ tools |
-| `src/game-api.mjs` | Client HTTP pra API do Crime.Life |
-| `src/captcha-solver.mjs` | Resolve hCaptcha via Nopecha API |
-| `src/brain.mjs` | Strategy I/O + shop data + fallback basico |
-| `src/memory.mjs` | Sistema de memoria persistente em .md |
-| `src/bot-loop.mjs` | Loop autonomo legado (fallback sem Claude Code) |
-| `src/dashboard.mjs` | Dashboard CLI |
-| `db/strategies/` | Estrategia do bot (evolui com o tempo) |
-| `db/learning/` | Aprendizados acumulados |
+| `src/server.mjs` | MCP server with 35+ tools |
+| `src/game-api.mjs` | HTTP client for the Crime.Life API |
+| `src/captcha-solver.mjs` | Solves hCaptcha via Nopecha API |
+| `src/brain.mjs` | Strategy I/O + shop data + basic fallback |
+| `src/memory.mjs` | Persistent memory system using .md files |
+| `src/bot-loop.mjs` | Legacy autonomous loop (fallback without Claude Code) |
+| `src/dashboard.mjs` | CLI dashboard |
+| `db/strategies/` | Bot strategy (evolves over time) |
+| `db/learning/` | Accumulated learnings |
 
-## Instalacao
+## Installation
 
-### Pre-requisitos
+### Prerequisites
 
 - [Node.js](https://nodejs.org/) v18+
 - [Claude Code CLI](https://claude.com/claude-code)
-- Conta no [Crime.Life](https://crime.life)
-- API key do [Nopecha](https://nopecha.com/) (resolver captchas)
+- [Crime.Life](https://crime.life) account
+- [Nopecha](https://nopecha.com/) API key (for captcha solving)
 
 ### Setup
 
-1. Clone o repositorio:
+1. Clone the repository:
 ```bash
-git clone <url-do-repo>
+git clone https://github.com/horizonfps/crime-life-mcp.git
 cd crime-life-mcp
 ```
 
-2. Instale as dependencias:
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-3. Copie os arquivos de exemplo e preencha com seus dados:
+3. Copy the example config files and fill in your data:
 ```bash
 cp .env.example .env
 cp .mcp.json.example .mcp.json
 ```
 
-4. Edite o `.env` com sua chave do Nopecha:
+4. Edit `.env` with your Nopecha key:
 ```env
 GAME_API_URL=https://api.crime.life
-NOPECHA_API_KEY=sua-chave-nopecha
+NOPECHA_API_KEY=your-nopecha-key
 ```
 
-5. Edite o `.mcp.json` com as credenciais da sua conta:
+5. Edit `.mcp.json` with your account credentials:
 ```json
 {
   "mcpServers": {
@@ -94,28 +94,28 @@ NOPECHA_API_KEY=sua-chave-nopecha
       "args": ["src/server.mjs"],
       "cwd": ".",
       "env": {
-        "ACCOUNT_EMAIL": "seu-email@exemplo.com",
-        "ACCOUNT_PASSWORD": "sua-senha"
+        "ACCOUNT_EMAIL": "your-email@example.com",
+        "ACCOUNT_PASSWORD": "your-password"
       }
     }
   }
 }
 ```
 
-### Rodando
+### Running
 
 ```bash
 cd crime-life-mcp
 claude
-# Dentro do Claude Code:
-# "joga pra mim" — Claude Code comeca a jogar
-# "ve o status" — mostra stats atuais
-# "evolui a estrategia" — revisa e melhora as regras
+# Inside Claude Code:
+# "play the game" — Claude Code starts playing
+# "check my stats" — shows current status
+# "evolve the strategy" — reviews and improves the rules
 ```
 
-## Multi-conta
+## Multi-account
 
-Cada conta e uma instancia separada do MCP server. Adicione no `.mcp.json`:
+Each account runs as a separate MCP server instance. Add to `.mcp.json`:
 
 ```json
 {
@@ -125,8 +125,8 @@ Cada conta e uma instancia separada do MCP server. Adicione no `.mcp.json`:
       "args": ["src/server.mjs"],
       "cwd": ".",
       "env": {
-        "ACCOUNT_EMAIL": "conta1@exemplo.com",
-        "ACCOUNT_PASSWORD": "senha1"
+        "ACCOUNT_EMAIL": "account1@example.com",
+        "ACCOUNT_PASSWORD": "password1"
       }
     },
     "crime-life-bot-2": {
@@ -134,59 +134,59 @@ Cada conta e uma instancia separada do MCP server. Adicione no `.mcp.json`:
       "args": ["src/server.mjs"],
       "cwd": ".",
       "env": {
-        "ACCOUNT_EMAIL": "conta2@exemplo.com",
-        "ACCOUNT_PASSWORD": "senha2"
+        "ACCOUNT_EMAIL": "account2@example.com",
+        "ACCOUNT_PASSWORD": "password2"
       }
     }
   }
 }
 ```
 
-Reinicie o Claude Code pra carregar os servers. As tools ficam duplicadas — uma por conta.
+Restart Claude Code to load the new servers. Tools will be duplicated — one per account.
 
-## Tools MCP
+## MCP Tools
 
-### Estrategia (o cerebro)
-| Tool | Descricao |
+### Strategy (the brain)
+| Tool | Description |
 |---|---|
-| `get_strategy` | Le a estrategia atual (auto-gera se nao existir) |
-| `update_strategy` | Reescreve a estrategia |
-| `scan_game` | Escaneia o jogo e regenera a estrategia do zero |
+| `get_strategy` | Read current strategy (auto-generates if none exists) |
+| `update_strategy` | Rewrite the strategy |
+| `scan_game` | Scan the game and regenerate strategy from scratch |
 
-### Jogo
-| Tool | Descricao |
+### Game
+| Tool | Description |
 |---|---|
-| `login` | Login manual |
-| `get_game_state` | Estado completo do jogo |
-| `get_weather` | Hora e clima |
+| `login` | Manual login |
+| `get_game_state` | Full game state |
+| `get_weather` | Time and weather |
 | `get_crimes` / `commit_crime` | Crimes |
-| `train` | Treinar stat |
+| `train` | Train a stat |
 | `attack_player` / `get_targets` / `check_attack` | PvP |
-| `join_club` / `buy_drug` | Nightclub e drogas |
-| `heal` / `instant_release` | Hospital e prisao |
-| `buy_item` / `equip_item` | Shop e equipamento |
-| `bank_status` / `bank_deposit` / `bank_withdraw` | Banco |
-| `collect_factory` | Fabricas |
+| `join_club` / `buy_drug` | Nightclub and drugs |
+| `heal` / `instant_release` | Hospital and prison |
+| `buy_item` / `equip_item` | Shop and equipment |
+| `bank_status` / `bank_deposit` / `bank_withdraw` | Bank |
+| `collect_factory` | Factories |
 | `gang_info` / `gang_crimes` / `gang_signup` | Gang |
 | `get_chat` / `send_chat` | Chat |
-| `get_daily_quests` / `complete_quest` | Quests diarias |
+| `get_daily_quests` / `complete_quest` | Daily quests |
 | `junkyard_recipes` / `junkyard_inventory` / `craft_item` | Junkyard |
-| `solve_captcha` | Captcha manual |
-| `search_player` | Busca jogadores |
-| `raw_api` | Request direto |
+| `solve_captcha` | Manual captcha solve |
+| `search_player` | Search players |
+| `raw_api` | Raw API request |
 
-### Memoria
-| Tool | Descricao |
+### Memory
+| Tool | Description |
 |---|---|
-| `save_memory` / `read_memory` | Salva/le memorias |
-| `list_memories` / `search_memories` | Lista/busca |
-| `memory_summary` | Resumo geral |
+| `save_memory` / `read_memory` | Save/read memories |
+| `list_memories` / `search_memories` | List/search |
+| `memory_summary` | Full summary |
 
-### Legado (bot autonomo)
-| Tool | Descricao |
+### Legacy (autonomous bot)
+| Tool | Description |
 |---|---|
-| `start_bot` / `stop_bot` / `bot_status` | Bot autonomo com fallback basico (sem Claude Code) |
+| `start_bot` / `stop_bot` / `bot_status` | Autonomous bot with basic fallback (no Claude Code) |
 
-## Licenca
+## License
 
 ISC
