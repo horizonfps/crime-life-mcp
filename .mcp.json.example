@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "crime-life-bot": {
+      "command": "node",
+      "args": ["src/server.mjs"],
+      "cwd": ".",
+      "env": {
+        "ACCOUNT_EMAIL": "your-email@example.com",
+        "ACCOUNT_PASSWORD": "your-password"
+      }
+    }
+  }
+}

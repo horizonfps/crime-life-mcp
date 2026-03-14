@@ -1,0 +1,10 @@
+node_modules/
+.env
+.mcp.json
+bot.log
+
+# Database (generated at runtime)
+db/**
+!db/strategies/
+db/strategies/**
+!db/strategies/.gitkeep
