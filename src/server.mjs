@@ -330,18 +330,18 @@ server.tool('gang_signup', 'Sign up for a gang crime', {
 // ---- CHAT ----
 
 server.tool('get_chat', 'Read recent chat messages', {
-  channel: z.string().optional().describe('Channel (global, gang)'),
+  channel: z.string().optional().describe('Channel (e.g. city-pt, city-en)'),
 }, async ({ channel }) => {
   await ensureLoggedIn();
-  return ok((await api.getChatMessages(channel || 'global'))?.data);
+  return ok((await api.getChatMessages(channel || 'city-pt'))?.data);
 });
 
 server.tool('send_chat', 'Send a message in game chat', {
   message: z.string().describe('Message text'),
-  channel: z.string().optional().describe('Channel (global, gang)'),
+  channel: z.string().optional().describe('Channel (e.g. city-pt, city-en)'),
 }, async ({ message, channel }) => {
   await ensureLoggedIn();
-  return ok((await api.sendChatMessage(message, channel || 'global'))?.data);
+  return ok((await api.sendChatMessage(message, channel || 'city-pt'))?.data);
 });
 
 // ---- DAILY QUESTS ----
