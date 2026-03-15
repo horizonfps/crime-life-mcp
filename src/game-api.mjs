@@ -42,6 +42,10 @@ function tok() { return sessionToken || authToken; }
 // ====== AUTH ======
 
 export async function login(email, password) {
+  // Clear stale tokens before re-login to avoid sending expired Bearer token
+  authToken = null;
+  sessionToken = null;
+  cookies = null;
   const data = await request('POST', '/player/login', { email, password });
   authToken = data?.token || data?.data?.token || null;
 
@@ -332,7 +336,7 @@ export async function getDailyQuests() {
 }
 
 export async function completeDailyQuest(questId) {
-  return request('POST', '/daily-quests/complete', { token: tok(), questid: questId });
+  return request('POST', '/daily-quests/complete', { token: tok(), id: questId });
 }
 
 // ====== WORLD ======

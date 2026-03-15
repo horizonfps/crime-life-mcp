@@ -352,7 +352,7 @@ server.tool('get_daily_quests', 'Get today\'s daily quests', {}, async () => {
 });
 
 server.tool('complete_quest', 'Complete a daily quest', {
-  questId: z.string().describe('Quest identifier'),
+  questId: z.coerce.number().describe('Quest identifier (numeric ID)'),
 }, async ({ questId }) => {
   await ensureLoggedIn();
   return ok((await api.completeDailyQuest(questId))?.data);
